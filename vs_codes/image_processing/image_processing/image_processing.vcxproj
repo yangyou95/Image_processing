@@ -19,13 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Pixel\ImageFunction.cpp" />
-    <ClCompile Include="..\..\..\Pixel\Pixel.cpp" />
-    <ClCompile Include="mian.cpp" />
+    <ClCompile Include="ImageFunction.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Pixel.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Pixel\ImageFunctions.h" />
-    <ClInclude Include="..\..\..\Pixel\Pixel.h" />
+    <ClInclude Include="header.h" />
+    <ClInclude Include="ImageFunctions.h" />
+    <ClInclude Include="Pixel.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -86,7 +87,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
