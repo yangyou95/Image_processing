@@ -8,13 +8,15 @@ void openIOFiles(ifstream& fin, ofstream& fout, char inputFilename[])
 	// define filestreams
 	char outputFilename[MAXLEN];
 
-	//define a string file path
-	string input_file_path;
+	//define files' paths (Yang)
+	string input_file_path,output_file_path;
 
 	// prompt user for input file
 	cout << "enter filename ";
 	cin >> inputFilename;
 
+
+	//define the input file path (Yang)
 	input_file_path = input_binary_folder_path + inputFilename;
 
 	// open .ppm binary file for input
@@ -23,7 +25,6 @@ void openIOFiles(ifstream& fin, ofstream& fout, char inputFilename[])
 	if (!fin) {
 		cout << "could not open file:"<< input_file_path  <<" bye" << endl;
 		
-
 		exit(1);
 	}
 
@@ -37,8 +38,11 @@ void openIOFiles(ifstream& fin, ofstream& fout, char inputFilename[])
 	// add extension to name
 	strcat(outputFilename, "P3.ppm");
 
+	//change the file path to the processed folder (Yang)
+	output_file_path = output_folder_path + outputFilename;
+
 	// open .ppm ascii file for output
-	fout.open(outputFilename);
+	fout.open(output_file_path);
 
 	if (!fout) {
 		cout << "cannot open output file: bye" << endl;
@@ -142,7 +146,7 @@ void readHeader(ifstream& fin, ofstream& fout, int imageInfo[])
 	char ch, aNumber[MAXWIDTH];
 	// input first line of text header(magic number)
 	// if the magic number is not P6 exit the program
-	fin.getline(magicNumber, 3);
+	fin.getline(magicNumber, 3); // can get (3-1=2) chars to "magicNumber" (Yang)
 	if (strcmp(magicNumber, "P6") != 0)
 	{
 		cout << "unexpected file format\n";
@@ -155,22 +159,29 @@ void readHeader(ifstream& fin, ofstream& fout, int imageInfo[])
 	fin.getline(bData, MAXLEN);
 	do {
 		// is this the beginning of a comment
-		ch = bData[bIndex];
+		ch = bData[bIndex]; // the first character after "magicNumber" (Yang)
 		if (ch == '#') {
 			// comment has been read
 			// get all characters until a newline is found
 			charCount = 0;
-			while (ch != terminator && charCount < MAXLEN) {
+			while (ch != terminator && charCount < MAXLEN) {  //terminator value is "@", it should be newline "OA" ? (Yang)
 				comment[charCount] = ch;
 				++bIndex;
 				++charCount;
 				ch = bData[bIndex];
 				cout << ch;
+
+			
 			}
-			if ((charCount == MAXLEN) && (ch != newline)) {
-				cout << "comment exceeded max length of " << MAXLEN << endl;
+			
+		
+			//This part causing problem (Yang)
+			/*if ((charCount == MAXLEN) && (ch != newline)) {
+				cout << " comment exceeded max length of " << MAXLEN << endl;
 				exit(1);
-			}
+			}*/
+
+
 			// get the next line of data
 			strcpy(bData, " ");
 			bIndex = 0;
