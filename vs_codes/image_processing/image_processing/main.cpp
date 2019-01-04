@@ -12,7 +12,10 @@ int main(){
 	char filename[20]; // set maximum size of filename
 	int imageInfo[3]; //set image info number
 	openIOFiles(input, output, filename); // call open function
-	readHeader(input,output,imageInfo); // Test readHeader
-	
+	// readHeader(input,output,imageInfo); // Test readHeader success
 
+	//Test converting function
+	vector<vector<Pixel>> imagepiexel;
+
+	convertP6ToP3(input, output, imagepiexel,imageInfo);
 }
