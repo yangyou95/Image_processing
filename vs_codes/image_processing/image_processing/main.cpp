@@ -17,5 +17,23 @@ int main(){
 	//Test converting function
 	vector<vector<Pixel>> imagepiexel;
 
-	convertP6ToP3(input, output, imagepiexel,imageInfo);
+	convertP6ToP3(input, output, imagepiexel,imageInfo); //no problem
+
+
+
+
+
+
+
+	//test smooth the image
+	smooth(imagepiexel);
+
+
+	//test output the p3 image
+	char comment[MAXLEN] = { "# Edited by Yang" };
+	ofstream output_smooth;
+	//change the file path to the processed folder (Yang)
+	string output_smooth_file_path = output_folder_path + filename + "smoothed.ppm";
+	output_smooth.open(output_smooth_file_path);
+	writeP3Image(output_smooth,imagepiexel,comment,255); 
 }

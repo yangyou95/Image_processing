@@ -41,8 +41,8 @@ void openIOFiles(ifstream& fin, ofstream& fout, char inputFilename[])
 	//change the file path to the processed folder (Yang)
 	output_file_path = output_folder_path + outputFilename;
 
-	// open .ppm ascii file for output
-	fout.open(output_file_path);
+	// open .ppm ascii file for output, add truncate mode to clear the previous data(Yang).
+	fout.open(output_file_path, ios::trunc);
 
 	if (!fout) {
 		cout << "cannot open output file: bye" << endl;
@@ -176,10 +176,10 @@ void readHeader(ifstream& fin, ofstream& fout, int imageInfo[])
 			
 		
 			//This part causing problem (Yang)
-			/*if ((charCount == MAXLEN) && (ch != newline)) {
+			if ((charCount == MAXLEN) && (ch != newline)) {
 				cout << " comment exceeded max length of " << MAXLEN << endl;
 				exit(1);
-			}*/
+			}
 
 
 			// get the next line of data
