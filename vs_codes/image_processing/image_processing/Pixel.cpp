@@ -14,9 +14,21 @@ Pixel Pixel::operator+(const Pixel& p) const
   return temp;
 }
 /*----------------------------------------------------------------*/
-/* Multiplication (*) operator.                                   */
+/* Addition (-) operator.     Edited by YANG                                   */
+Pixel Pixel::operator-(const Pixel& p) const
+{
+	Pixel temp;
+	temp.red = red - p.red;
+	temp.green = green - p.green;
+	temp.blue = blue - p.blue;
+	temp.validate();
+	return temp;
+}
+/*----------------------------------------------------------------*/
+/* Multiplication (*) operator.    Modified by Yang                                */
 Pixel Pixel::operator*(double v) const
 {
+	
   Pixel temp;
   temp.red = static_cast<unsigned int>(red*v);
   temp.green = static_cast<unsigned int>(green*v);

@@ -17,6 +17,7 @@ const char nullChar('\0');
 void openIOFiles(ifstream& fin, ofstream& fout, char inputFilename[]);
 void convertP6ToP3(ifstream& bin, ofstream& out, vector<vector<Pixel> >& image, int info[1]);
 void smooth(vector<vector<Pixel> >& image);
+void sharpen(vector<vector<Pixel> >& image, vector<vector<Pixel> >& output);
 void writeP3Image(ofstream& out, vector<vector<Pixel> >& image, char comment[], int maxColor);
 void readAndWriteImageData(ifstream& fin, ofstream& fout, vector<vector<Pixel> >& image, int w, int h);
 void readHeader(ifstream& fin, ofstream& fout, int imageInfo[]);

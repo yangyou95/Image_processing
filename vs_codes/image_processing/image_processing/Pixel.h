@@ -37,11 +37,16 @@ class Pixel
 	//Addition.
 	Pixel operator+(const Pixel& p) const;
 
+	//Substaction
+	Pixel operator-(const Pixel& p) const;
+
 	//Multiplication of a Pixel by a floating point value.
 	Pixel operator*(double v) const;
 
 	//Division of a Pixel by an integer value.
 	Pixel operator/(unsigned v) const;
+
+
 
 	//Input operator.
 	friend istream& operator >>(istream& in, Pixel& p);

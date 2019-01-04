@@ -56,7 +56,7 @@ void convertP6ToP3(ifstream& bin, ofstream& out, vector<vector<Pixel> >& image, 
 	readAndWriteImageData(bin, out, image, width, height);
 }
 
-
+//tested, smoothing (Yang)
 void smooth(vector<vector<Pixel> >& image)
 {
 	int h = image.size();
@@ -69,6 +69,38 @@ void smooth(vector<vector<Pixel> >& image)
 			sum = image[i + 1][j] + image[i - 1][j] + image[i][j + 1] + image[i][j - 1];
 			sum = sum / 4;
 			image[i][j] = sum;
+		}
+}
+
+//Writen by yang
+void sharpen(vector<vector<Pixel> >& image, vector<vector<Pixel> >& output)
+{
+	int h = image.size();
+	int w = image[0].size();
+
+	// allocate memory for the output piexel
+	output.resize(h); // allocate h rows
+	for (int i = 0; i < h; i++)
+	{
+		output[i].resize(w);   // for each row allocate w columns
+	}
+
+	Pixel sum;
+	for (int i = 1; i < h - 1; i++)
+		for (int j = 1; j < w - 1; j++)
+		{
+			sum = image[i][j]*20 - image[i - 1][j-1] - image[i-1][j] - image[i - 1][j+1] - image[i][j - 1] - image[i][j + 1] - image[i + 1][j-1] - image[i + 1][j] - image[i + 1][j+1];
+			sum = sum / 9;
+			if (sum.getBlue() >= 255) {
+				sum.setBlue(255);
+			};
+			if (sum.getGreen() >= 255) {
+				sum.setGreen(255);
+			};
+			if (sum.getRed() >= 255) {
+				sum.setRed(255);
+			};
+			output[i][j] = sum;
 		}
 }
 
