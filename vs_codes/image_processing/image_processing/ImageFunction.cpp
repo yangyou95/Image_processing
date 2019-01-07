@@ -3,7 +3,7 @@
 
 
 using namespace std;
-void openIOFiles(ifstream& fin, ofstream& fout, char inputFilename[])
+void openIOFiles(ifstream& fin, ofstream& fout, char inputFilename[], int readtype)
 {
 	// define filestreams
 	char outputFilename[MAXLEN];
@@ -20,7 +20,18 @@ void openIOFiles(ifstream& fin, ofstream& fout, char inputFilename[])
 	input_file_path = input_binary_folder_path + inputFilename;
 
 	// open .ppm binary file for input
-	fin.open(input_file_path, ios::binary);
+	if (readtype == 2) {
+		fin.open(input_file_path, ios::binary);
+	}
+	else if (readtype == 1) {
+		fin.open(input_file_path);
+	}
+	else {
+		cout << "Wrong Type!" << endl;
+		exit(1);
+	}
+
+
 
 	if (!fin) {
 		cout << "could not open file:"<< input_file_path  <<" bye" << endl;
@@ -72,7 +83,7 @@ void smooth(vector<vector<Pixel> >& image)
 		}
 }
 
-//Writen by yang
+//Written by yang
 void sharpen(vector<vector<Pixel> >& image, vector<vector<Pixel> >& output)
 {
 	int h = image.size();
@@ -86,10 +97,10 @@ void sharpen(vector<vector<Pixel> >& image, vector<vector<Pixel> >& output)
 	}
 
 	Pixel sum;
-	for (int i = 1; i < h - 1; i++)
+	for (int i = 1; i < h - 1; i++) {
 		for (int j = 1; j < w - 1; j++)
 		{
-			sum = image[i][j]*20 - image[i - 1][j-1] - image[i-1][j] - image[i - 1][j+1] - image[i][j - 1] - image[i][j + 1] - image[i + 1][j-1] - image[i + 1][j] - image[i + 1][j+1];
+			sum = image[i][j] * 20 - image[i - 1][j - 1] - image[i - 1][j] - image[i - 1][j + 1] - image[i][j - 1] - image[i][j + 1] - image[i + 1][j - 1] - image[i + 1][j] - image[i + 1][j + 1];
 			sum = sum / 9;
 			if (sum.getBlue() >= 255) {
 				sum.setBlue(255);
@@ -102,7 +113,55 @@ void sharpen(vector<vector<Pixel> >& image, vector<vector<Pixel> >& output)
 			};
 			output[i][j] = sum;
 		}
+	}
 }
+
+//Written by Yang
+void edgedetection(vector<vector<Pixel> >& image, vector<vector<Pixel> >& output)
+{
+	int h = image.size();
+	int w = image[0].size();
+
+	// allocate memory for the output piexel
+	output.resize(h); // allocate h rows
+	for (int i = 0; i < h; i++)
+	{
+		output[i].resize(w);   // for each row allocate w columns
+	}
+
+	Pixel sum_vertical, sum_horizontal,sum;
+
+	for (int i = 1; i < h - 1; i++) {
+		for (int j = 1; j < w - 1; j++)
+		{
+			sum_vertical = image[i-1][j-1]+image[i-1][j]*2+image[i-1][j+1]-image[i+1][j-1]+image[i+1][j]+image[i+1][j+1];
+			sum_vertical = sum_vertical / 6;
+
+			sum_horizontal = image[i - 1][j - 1] + image[i][j - 1] * 2 + image[i + 1][j - 1] - image[i - 1][j + 1] - image[i][j + 1] * 2 - image[i + 1][j + 1];
+			sum_horizontal = sum_horizontal / 6;
+
+			sum = (sum_vertical ^ 2) + (sum_horizontal ^ 2);
+			sum = sum ^ (0.5);
+
+			if (sum.getBlue() >= 255) {
+				sum.setBlue(255);
+			};
+			if (sum.getGreen() >= 255) {
+				sum.setGreen(255);
+			};
+			if (sum.getRed() >= 255) {
+				sum.setRed(255);
+			};
+			output[i][j] = sum;
+		}
+	}
+}
+
+
+
+
+
+
 
 void writeP3Image(ofstream& out, vector<vector<Pixel> >& image, char comment[], int maxColor)
 {
@@ -134,6 +193,10 @@ void readAndWriteImageData(ifstream& fin, ofstream& fout, vector<vector<Pixel> >
 
 	int charCount = 0;
 	char colorByte;
+
+	//test for P3 read
+	int p3value;
+
 	unsigned char aChar;
 	unsigned int triple[3];   // red, green, blue
 
@@ -179,6 +242,7 @@ void readHeader(ifstream& fin, ofstream& fout, int imageInfo[])
 	// input first line of text header(magic number)
 	// if the magic number is not P6 exit the program
 	fin.getline(magicNumber, 3); // can get (3-1=2) chars to "magicNumber" (Yang)
+	
 	if (strcmp(magicNumber, "P6") != 0)
 	{
 		cout << "unexpected file format\n";
@@ -201,19 +265,13 @@ void readHeader(ifstream& fin, ofstream& fout, int imageInfo[])
 				++bIndex;
 				++charCount;
 				ch = bData[bIndex];
-				cout << ch;
-
-			
-			}
-			
-		
+				cout << ch;			
+			}			
 			//This part causing problem (Yang)
 			if ((charCount == MAXLEN) && (ch != newline)) {
 				cout << " comment exceeded max length of " << MAXLEN << endl;
 				exit(1);
 			}
-
-
 			// get the next line of data
 			strcpy(bData, " ");
 			bIndex = 0;
@@ -239,7 +297,6 @@ void readHeader(ifstream& fin, ofstream& fout, int imageInfo[])
 					exit(1);
 				}
 			}
-
 			// look at size of aNumber
 			if (charCount > 0) {
 				// we have image information, terminate string
@@ -285,3 +342,103 @@ void writeHeader(ofstream& fout, char magicNumber[], char comment[], int w, int 
 	fout << w << ' ' << h << ' ' << maxPixelVal << newline;
 }
 
+void readP3Header(ifstream& fin, ofstream& fout, int imageInfo[])
+{
+	// define and initialise input variables
+	char bData[MAXLEN] = { 0 }, magicNumber[MAXWIDTH], comment[MAXLEN] = { "#" };
+	int bIndex = 0, charCount = 0, infoCount = 0;
+	char ch, aNumber[MAXWIDTH];
+	// input first line of text header(magic number)
+	// if the magic number is not P6 exit the program
+	fin.getline(magicNumber, 3); // can get (3-1=2) chars to "magicNumber" (Yang)
+
+	if (strcmp(magicNumber, "P3") != 0)
+	{
+		cout << "unexpected file format\n";
+		exit(1);
+	}
+	// clear bData array and reset bIndex
+	// input next line of text header
+	strcpy(bData, " ");
+	bIndex = 0;
+	fin.getline(bData, MAXLEN);
+	do {
+		// is this the beginning of a comment
+		ch = bData[bIndex]; // the first character after "magicNumber" (Yang)
+		if (ch == '#') {
+			// comment has been read
+			// get all characters until a newline is found
+			charCount = 0;
+			while (ch != terminator && charCount < MAXLEN) {  //terminator value is "@", it should be newline "OA" ? (Yang)
+				comment[charCount] = ch;
+				++bIndex;
+				++charCount;
+				ch = bData[bIndex];
+				cout << ch;
+			}
+			//This part causing problem (Yang)
+			if ((charCount == MAXLEN) && (ch != newline)) {
+				cout << " comment exceeded max length of " << MAXLEN << endl;
+				exit(1);
+			}
+			// get the next line of data
+			strcpy(bData, " ");
+			bIndex = 0;
+			fin.getline(bData, MAXLEN);
+		}
+		else {
+			// this is not a comment
+			// parse bData for image information
+			charCount = 0;
+			// look past whitespace
+			while (bIndex < MAXLEN && isspace(bData[bIndex])) {
+				++bIndex;
+			}
+			// may be the beginning of a decimal value
+			while (bIndex < MAXLEN && isdigit(bData[bIndex]))
+			{
+				aNumber[charCount] = bData[bIndex];
+				++bIndex;
+				++charCount;
+				if (charCount == MAXWIDTH)
+				{
+					cerr << "Maximum width of " << MAXWIDTH << " digits was exceeded.. " << endl;
+					exit(1);
+				}
+			}
+			// look at size of aNumber
+			if (charCount > 0) {
+				// we have image information, terminate string
+				aNumber[charCount] = nullChar;
+				// convert from ascii to integer
+				imageInfo[infoCount] = atoi(aNumber);
+				++infoCount;
+				// verify input
+				switch (infoCount) {
+				case 1: cout << "a width of " << imageInfo[infoCount - 1] << " has been read " << endl;
+					break;
+				case 2: cout << " a height of " << imageInfo[infoCount - 1] << " has bene read " << endl;
+					break;
+				case 3: cout << "maxcolor of " << imageInfo[infoCount - 1] << " has been read " << endl;
+					break;
+				}
+			}
+			else if (infoCount < 3) {
+				// aNumber has 0 digits and infoCount < 3
+				// we need more image information
+				// get next line of data and parse for image information
+				strcpy(bData, " ");
+				bIndex = 0;
+				fin.getline(bData, MAXLEN);
+			}
+		}
+	} while (infoCount < 3 && !fin.eof());
+	if (infoCount < 3) {
+		cerr << "image information could not be found " << endl;
+		exit(1);
+	}
+	// we have all of the information
+	// write header to ascii file
+	strcpy(magicNumber, "P3");
+	writeHeader(fout, magicNumber, comment, imageInfo[0], imageInfo[1], imageInfo[2]);
+}

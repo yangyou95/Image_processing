@@ -37,6 +37,20 @@ Pixel Pixel::operator*(double v) const
   return temp;
 }
 /*----------------------------------------------------------------*/
+/* Power (^) operator.    Edited by Yang                                */
+Pixel Pixel::operator^(double v) const
+{
+
+	Pixel temp;
+	temp.red = static_cast<unsigned int>(pow(red,v));
+	temp.green = static_cast<unsigned int>(pow(green,v));
+	temp.blue = static_cast<unsigned int>(pow(blue,v));
+	temp.validate();
+	return temp;
+}
+
+/*----------------------------------------------------------------*/
+
 /* Division (/) operator.                                         */
 Pixel Pixel::operator/(unsigned int v) const
 {

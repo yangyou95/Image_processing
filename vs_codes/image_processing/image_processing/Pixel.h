@@ -27,6 +27,7 @@ class Pixel
 	unsigned getGreen() const {return green;}
 	unsigned getBlue() const {return blue;}
 
+
 	// Mutator Methods
 	Pixel& setPixel(unsigned r, unsigned g, unsigned b);
 	Pixel& setRed(unsigned r); 
@@ -37,14 +38,17 @@ class Pixel
 	//Addition.
 	Pixel operator+(const Pixel& p) const;
 
-	//Substaction
+	//Substaction (Yang)
 	Pixel operator-(const Pixel& p) const;
+
+	//power(Yang)
+	Pixel operator^(double v) const;
 
 	//Multiplication of a Pixel by a floating point value.
 	Pixel operator*(double v) const;
 
 	//Division of a Pixel by an integer value.
-	Pixel operator/(unsigned v) const;
+	Pixel operator/(unsigned int v) const;
 
 
 
