@@ -11,6 +11,7 @@ Pixel Pixel::operator+(const Pixel& p) const
   temp.green = green + p.green;
   temp.blue = blue + p.blue;
   temp.validate();
+
   return temp;
 }
 /*----------------------------------------------------------------*/
@@ -22,6 +23,7 @@ Pixel Pixel::operator-(const Pixel& p) const
 	temp.green = green - p.green;
 	temp.blue = blue - p.blue;
 	temp.validate();
+
 	return temp;
 }
 /*----------------------------------------------------------------*/
@@ -175,7 +177,7 @@ void Pixel::reset()
   if(red > MAXVAL) red = MAXVAL;
   if(green > MAXVAL) green = MAXVAL;
   if(blue > MAXVAL) blue = MAXVAL;
-  overflowFlag = 0;
+  overflowFlag = 0; 
 }
 
 /*----------------------------------------------------------------*/

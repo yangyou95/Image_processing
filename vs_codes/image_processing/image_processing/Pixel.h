@@ -11,11 +11,11 @@ class Pixel
 {
   public:
 	// constants to enable undeflow/overflow detection in rgb values
-	static const unsigned int MAXVAL = 255;
-	static const unsigned short RMASK = 4;
-	static const unsigned short GMASK = 2;
-	static const unsigned short BMASK = 1;
-	static const unsigned short CHECK = 7;
+	static const int MAXVAL = 255;
+	static const short RMASK = 4;
+	static const short GMASK = 2;
+	static const short BMASK = 1;
+	static const short CHECK = 7;
 
 	//Constructors 
 	Pixel(); //Default

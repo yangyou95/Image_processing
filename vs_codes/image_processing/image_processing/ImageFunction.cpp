@@ -3,7 +3,7 @@
 
 
 using namespace std;
-void openIOFiles(ifstream& fin, ofstream& fout, char inputFilename[], int readtype)
+void openIOFiles(ifstream& fin, ofstream& fout, char inputFilename[])
 {
 	// define filestreams
 	char outputFilename[MAXLEN];
@@ -20,16 +20,8 @@ void openIOFiles(ifstream& fin, ofstream& fout, char inputFilename[], int readty
 	input_file_path = input_binary_folder_path + inputFilename;
 
 	// open .ppm binary file for input
-	if (readtype == 2) {
-		fin.open(input_file_path, ios::binary);
-	}
-	else if (readtype == 1) {
-		fin.open(input_file_path);
-	}
-	else {
-		cout << "Wrong Type!" << endl;
-		exit(1);
-	}
+	fin.open(input_file_path, ios::binary);
+
 
 
 
@@ -67,19 +59,47 @@ void convertP6ToP3(ifstream& bin, ofstream& out, vector<vector<Pixel> >& image, 
 	readAndWriteImageData(bin, out, image, width, height);
 }
 
-//tested, smoothing (Yang)
-void smooth(vector<vector<Pixel> >& image)
+ //tested, smoothing (Yang)
+void smooth(vector<vector<Pixel> >& image, vector<vector<Pixel> >& output)
 {
 	int h = image.size();
 	int w = image[0].size();
+
+	// allocate memory for the output piexel
+	output.resize(h); // allocate h rows
+	for (int i = 0; i < h; i++)
+	{
+		output[i].resize(w);   // for each row allocate w columns
+	}
 
 	Pixel sum;
 	for (int i=1; i<h-1; i++)
 		for (int j = 1; j < w - 1; j++)
 		{
-			sum = image[i + 1][j] + image[i - 1][j] + image[i][j + 1] + image[i][j - 1];
+			sum =  image[i + 1][j] + image[i - 1][j] + image[i][j + 1] + image[i][j - 1];
 			sum = sum / 4;
-			image[i][j] = sum;
+			if (sum.getBlue() >= 255) {
+				sum.setBlue(255);
+			}
+			else if (sum.getBlue() <= 0) {
+				sum.setBlue(0);
+			};
+			if (sum.getGreen() >= 255) {
+				sum.setGreen(255);
+			}
+			else if (sum.getGreen() <= 0) {
+				sum.setGreen(0);
+			};
+			if (sum.getRed() >= 255) {
+				sum.setRed(255);
+			}
+			else if (sum.getRed() <= 0) {
+				sum.setRed(0);
+			};
+			output[i][j] = sum;
+
+
+
 		}
 }
 
@@ -100,67 +120,190 @@ void sharpen(vector<vector<Pixel> >& image, vector<vector<Pixel> >& output)
 	for (int i = 1; i < h - 1; i++) {
 		for (int j = 1; j < w - 1; j++)
 		{
-			sum = image[i][j] * 20 - image[i - 1][j - 1] - image[i - 1][j] - image[i - 1][j + 1] - image[i][j - 1] - image[i][j + 1] - image[i + 1][j - 1] - image[i + 1][j] - image[i + 1][j + 1];
-			sum = sum / 9;
-			if (sum.getBlue() >= 255) {
-				sum.setBlue(255);
+			int blue = image[i][j].getBlue() * 12 - (image[i - 1][j - 1] + image[i - 1][j] + image[i - 1][j + 1] + image[i][j - 1] + image[i][j + 1] + image[i + 1][j - 1] + image[i + 1][j] + image[i + 1][j + 1]).getBlue();
+			int green = image[i][j].getGreen() * 12 - (image[i - 1][j - 1] + image[i - 1][j] + image[i - 1][j + 1] + image[i][j - 1] + image[i][j + 1] + image[i + 1][j - 1] + image[i + 1][j] + image[i + 1][j + 1]).getGreen();
+			int red = image[i][j].getRed() * 12 - (image[i - 1][j - 1] + image[i - 1][j] + image[i - 1][j + 1] + image[i][j - 1] + image[i][j + 1] + image[i + 1][j - 1] + image[i + 1][j] + image[i + 1][j + 1]).getRed();
+			blue = blue / 4;
+			green = green / 4;
+			red = red / 4;
+			if (blue >= 255) {
+				blue = 255;
+			}
+			else if (blue <= 0) {
+				blue = 0;
 			};
-			if (sum.getGreen() >= 255) {
-				sum.setGreen(255);
+			if (green >= 255) {
+				green = 255;
+			}
+			else if (green <= 0) {
+				green =0 ;
 			};
-			if (sum.getRed() >= 255) {
-				sum.setRed(255);
+			if (red >= 255) {
+				red = 255;
+			}
+			else if (red <= 0) {
+				red = 0;
 			};
-			output[i][j] = sum;
+			output[i][j].setBlue(blue); 
+			output[i][j].setGreen(green);
+			output[i][j].setRed(red);
 		}
 	}
 }
 
 //Written by Yang
-void edgedetection(vector<vector<Pixel> >& image, vector<vector<Pixel> >& output)
+void edgedetection(vector<vector<Pixel> >& image, vector<vector<Pixel> >& output, vector<vector<Pixel> >& vectorial, vector<vector<Pixel> >& horizontal)
 {
 	int h = image.size();
 	int w = image[0].size();
 
+	int vertical_filter[3][3] = { 1,2,1,
+								0,0,0,
+								-1,-2,-1 };
+
+	int horizontal_filter[3][3] = { 1,0,-1,
+									2,0,-2,
+									1,0,-1
+	};
+
+
+	int sum_blue;
+	int sum_green;
+	int sum_red;
 	// allocate memory for the output piexel
 	output.resize(h); // allocate h rows
+	vectorial.resize(h);
+	horizontal.resize(h);
+
 	for (int i = 0; i < h; i++)
 	{
 		output[i].resize(w);   // for each row allocate w columns
+		vectorial[i].resize(w);   // for each row allocate w columns
+		horizontal[i].resize(w);   // for each row allocate w columns
 	}
 
-	Pixel sum_vertical, sum_horizontal,sum;
+	Pixel sum_vertical, sum_horizontal;
 
 	for (int i = 1; i < h - 1; i++) {
 		for (int j = 1; j < w - 1; j++)
 		{
-			sum_vertical = image[i-1][j-1]+image[i-1][j]*2+image[i-1][j+1]-image[i+1][j-1]+image[i+1][j]+image[i+1][j+1];
-			sum_vertical = sum_vertical / 6;
+			int blue_vertical;
+			int green_vertical;
+			int red_vertical;
+			int blue_horizontal;
+			int green_horizontal;
+			int red_horizontal;	
 
-			sum_horizontal = image[i - 1][j - 1] + image[i][j - 1] * 2 + image[i + 1][j - 1] - image[i - 1][j + 1] - image[i][j + 1] * 2 - image[i + 1][j + 1];
-			sum_horizontal = sum_horizontal / 6;
+			int sum_blue_vertical = 0;
+			int sum_green_vertical = 0;
+			int sum_red_vertical = 0;
+			int sum_blue_horizontal = 0;
+			int sum_green_horizontal = 0;
+			int sum_red_horizontal = 0;
+			//filter process 
+			for(int row =i - 1; row <= i+1;row++)
+				for (int col = j - 1; col <= j + 1; col++) {	
+					int a = row - (i -1);
+					int b = col - (j - 1);
+					//verical filter
+					blue_vertical = image[row][col].getBlue() * vertical_filter[a][b];
+					green_vertical = image[row][col].getGreen() * vertical_filter[a][b];
+					red_vertical = image[row][col].getRed() * vertical_filter[a][b];
 
-			sum = (sum_vertical ^ 2) + (sum_horizontal ^ 2);
-			sum = sum ^ (0.5);
+					sum_blue_vertical = sum_blue_vertical + blue_vertical;
+					sum_green_vertical = sum_green_vertical + green_vertical;
+					sum_red_vertical = sum_red_vertical + red_vertical;
 
-			if (sum.getBlue() >= 255) {
-				sum.setBlue(255);
+					//horizontal filter
+					blue_horizontal = image[row][col].getBlue() * horizontal_filter[a][b];
+					green_horizontal = image[row][col].getGreen() * horizontal_filter[a][b];
+					red_horizontal = image[row][col].getRed() * horizontal_filter[a][b];
+
+					sum_blue_horizontal = sum_blue_horizontal + blue_horizontal;
+					sum_green_horizontal = sum_green_horizontal + green_horizontal;
+					sum_red_horizontal = sum_red_horizontal + red_horizontal;
+				}
+			//prevent vertical process overflow 
+			if (sum_blue_vertical >= 255) {
+				sum_blue_vertical = 255;
+			}
+			else if (sum_blue_vertical <= 0) {
+				sum_blue_vertical = 0;
 			};
-			if (sum.getGreen() >= 255) {
-				sum.setGreen(255);
+			if (sum_green_vertical >= 255) {
+				sum_green_vertical = 255;
+			}
+			else if (sum_green_vertical <= 0) {
+				sum_green_vertical = 0;
 			};
-			if (sum.getRed() >= 255) {
-				sum.setRed(255);
+			if (sum_red_vertical >= 255) {
+				sum_red_vertical = 255;
+			}
+			else if (sum_red_vertical <= 0) {
+				sum_red_vertical = 0;
 			};
-			output[i][j] = sum;
+			//prevent horizontal process overflow 
+			if (sum_blue_horizontal >= 255) {
+				sum_blue_horizontal = 255;
+			}
+			else if (sum_blue_horizontal <= 0) {
+				sum_blue_horizontal = 0;
+			};
+			if (sum_green_horizontal >= 255) {
+				sum_green_horizontal = 255;
+			}
+			else if (sum_green_horizontal <= 0) {
+				sum_green_horizontal = 0;
+			};
+			if (sum_red_horizontal >= 255) {
+				sum_red_horizontal = 255;
+			}
+			else if (sum_red_horizontal <= 0) {
+				sum_red_horizontal = 0;
+			};
+
+			//vertical filter process result
+			vectorial[i][j].setBlue(sum_blue_vertical);
+			vectorial[i][j].setGreen(sum_green_vertical);
+			vectorial[i][j].setRed(sum_red_vertical);
+			//horizontal filter process result
+			horizontal[i][j].setBlue(sum_blue_horizontal);
+			horizontal[i][j].setGreen(sum_green_horizontal);
+			horizontal[i][j].setRed(sum_red_horizontal);
+
+			sum_blue = sqrt((pow(sum_blue_horizontal,2)) + (pow(sum_blue_vertical , 2)));
+			sum_green = sqrt((pow(sum_green_horizontal , 2)) + (pow(sum_green_vertical,2)));
+			sum_red = sqrt((pow(sum_red_horizontal , 2)) + (pow(sum_red_vertical ,2)));
+
+			if (sum_blue >= 255) {
+				sum_blue = 255;
+			}
+			else if (sum_blue <= 0) {
+				sum_blue = 0;
+			};
+			if (sum_green >= 255) {
+				sum_green = 255;
+			}
+			else if (sum_green <= 0) {
+				sum_green = 0;
+			};
+			if (sum_red >= 255) {
+				sum_red = 255;
+			}
+			else if (sum_red <= 0) {
+				sum_red = 0;
+			};
+			output[i][j].setBlue(sum_blue);
+			output[i][j].setGreen(sum_green);
+			output[i][j].setRed(sum_red);
+
+			sum_blue = 0;
+			sum_green = 0;
+			sum_red = 0;
+
 		}
 	}
 }
-
-
-
-
-
 
 
 void writeP3Image(ofstream& out, vector<vector<Pixel> >& image, char comment[], int maxColor)
@@ -187,6 +330,53 @@ void writeP3Image(ofstream& out, vector<vector<Pixel> >& image, char comment[], 
 
 
 void readAndWriteImageData(ifstream& fin, ofstream& fout, vector<vector<Pixel> >& image, int w, int h)
+{
+	// read and write image data
+	// define input variables
+
+	int charCount = 0;
+	char colorByte;
+
+	//test for P3 read
+	int p3value;
+
+	unsigned char aChar;
+	unsigned int triple[3];   // red, green, blue
+
+	// allocate memory
+	image.resize(h); // allocate h rows
+
+	for (int i = 0; i < h; i++)
+	{
+		image[i].resize(w);   // for each row allocate w columns
+		for (int j = 0; j < w; j++)
+		{
+			for (int k = 0; k < 3; k++)
+			{
+				// read one byte
+				fin.read(&colorByte, 1);
+
+				// convert to unsigned char
+				aChar = (unsigned char)colorByte;
+
+				// save as unsigned int
+				triple[k] = (unsigned int)aChar;
+
+				// write as int
+				fout << triple[k] << ' ';
+			}
+			// CR printed over 32 pixels
+			++charCount;
+			if (charCount == 32) {
+				fout << "\r\n";
+				charCount = 0;
+			}
+			image[i][j].setPixel(triple[0], triple[1], triple[2]);
+		}
+	}
+}
+
+void readAndWriteP3ImageData(ifstream& fin, ofstream& fout, vector<vector<Pixel> >& image, int w, int h)
 {
 	// read and write image data
 	// define input variables
