@@ -6,6 +6,7 @@ using namespace std;
 void image_process(vector<vector<Pixel>> &imagepiexel, char filename[]);
 
 int main() {
+	cout << "This program is used to process P6 type ppm image, Please slect the file needed to process in the binary folder, the output image will be stored as type P3." << endl;
 	string inputfile;
 	ifstream input; // define input stream
 	ofstream output; // define output stream
@@ -14,7 +15,7 @@ int main() {
 	vector<vector<Pixel>> imagepiexel; // define a pixel var in Pixel class
 	openIOFiles(input, output, filename); // call open function
 	convertP6ToP3(input, output, imagepiexel, imageInfo);//convert P6 type to P3 
-	image_process(imagepiexel, filename); // image process function
+	image_process(imagepiexel, filename); // call image process function
 }
 
 //Image processing function
@@ -25,7 +26,7 @@ void image_process(vector<vector<Pixel>> &imagepiexel, char filename[]) {
 	cout << "Please enter the number of which process you want choose: 1.Smooth; 2.Sharpen; 3. Edge detection." << endl;
 	cin >> chosen;
 	if (chosen == 1) {
-		//smooth the image 
+		//image smoothing 
 		smooth(imagepiexel,outputpiexel);
 		//output the p3 image 
 		ofstream output_smooth;
@@ -35,6 +36,7 @@ void image_process(vector<vector<Pixel>> &imagepiexel, char filename[]) {
 		writeP3Image(output_smooth, outputpiexel, comment, 255);
 	}
 	else if (chosen == 2) {
+		// image sharpening
 		vector<vector<Pixel>> sharpenoutputpiexel;
 		sharpen(imagepiexel, sharpenoutputpiexel);
 		//output the p3 image 
@@ -45,7 +47,7 @@ void image_process(vector<vector<Pixel>> &imagepiexel, char filename[]) {
 		writeP3Image(output_sharpen, sharpenoutputpiexel, comment, 255);
 	}
 	else if (chosen == 3) {
-		//test edge detection
+		//edge detection
 		vector<vector<Pixel>> edgeoutputpiexel;
 		vector<vector<Pixel>> h_edgeoutputpiexel;
 		vector<vector<Pixel>> v_edgeoutputpiexel;

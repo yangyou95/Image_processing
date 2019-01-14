@@ -22,9 +22,6 @@ void openIOFiles(ifstream& fin, ofstream& fout, char inputFilename[])
 	// open .ppm binary file for input
 	fin.open(input_file_path, ios::binary);
 
-
-
-
 	if (!fin) {
 		cout << "could not open file:"<< input_file_path  <<" bye" << endl;
 		
@@ -97,9 +94,6 @@ void smooth(vector<vector<Pixel> >& image, vector<vector<Pixel> >& output)
 				sum.setRed(0);
 			};
 			output[i][j] = sum;
-
-
-
 		}
 }
 
@@ -120,12 +114,27 @@ void sharpen(vector<vector<Pixel> >& image, vector<vector<Pixel> >& output)
 	for (int i = 1; i < h - 1; i++) {
 		for (int j = 1; j < w - 1; j++)
 		{
-			int blue = image[i][j].getBlue() * 12 - (image[i - 1][j - 1] + image[i - 1][j] + image[i - 1][j + 1] + image[i][j - 1] + image[i][j + 1] + image[i + 1][j - 1] + image[i + 1][j] + image[i + 1][j + 1]).getBlue();
-			int green = image[i][j].getGreen() * 12 - (image[i - 1][j - 1] + image[i - 1][j] + image[i - 1][j + 1] + image[i][j - 1] + image[i][j + 1] + image[i + 1][j - 1] + image[i + 1][j] + image[i + 1][j + 1]).getGreen();
-			int red = image[i][j].getRed() * 12 - (image[i - 1][j - 1] + image[i - 1][j] + image[i - 1][j + 1] + image[i][j - 1] + image[i][j + 1] + image[i + 1][j - 1] + image[i + 1][j] + image[i + 1][j + 1]).getRed();
-			blue = blue / 4;
-			green = green / 4;
-			red = red / 4;
+
+			//First sharpen filter: Laplacian operator. (f(i,j) = g(i,j) - c*s(i,j)), cofficient c = 1.0
+			//int C = 1.0; // Cofficient
+			//int blue = image[i][j].getBlue() + C*( image[i][j].getBlue() * 8 - (image[i - 1][j - 1] + image[i - 1][j] + image[i - 1][j + 1] + image[i][j - 1] + image[i][j + 1] + image[i + 1][j - 1] + image[i + 1][j] + image[i + 1][j + 1]).getBlue());
+			//int green = image[i][j].getGreen() + C* (image[i][j].getGreen() * 8 - (image[i - 1][j - 1] + image[i - 1][j] + image[i - 1][j + 1] + image[i][j - 1] + image[i][j + 1] + image[i + 1][j - 1] + image[i + 1][j] + image[i + 1][j + 1]).getGreen() );
+			//int red = image[i][j].getRed()+ C*(image[i][j].getRed() * 8 - (image[i - 1][j - 1] + image[i - 1][j] + image[i - 1][j + 1] + image[i][j - 1] + image[i][j + 1] + image[i + 1][j - 1] + image[i + 1][j] + image[i + 1][j + 1]).getRed() );
+			
+			//Laplacian operator could be also used for edge detection. -S(i,j)
+			int blue = (image[i][j].getBlue() * 8 - (image[i - 1][j - 1] + image[i - 1][j] + image[i - 1][j + 1] + image[i][j - 1] + image[i][j + 1] + image[i + 1][j - 1] + image[i + 1][j] + image[i + 1][j + 1]).getBlue());
+			int green = (image[i][j].getGreen() * 8 - (image[i - 1][j - 1] + image[i - 1][j] + image[i - 1][j + 1] + image[i][j - 1] + image[i][j + 1] + image[i + 1][j - 1] + image[i + 1][j] + image[i + 1][j + 1]).getGreen());
+			int red = (image[i][j].getRed() * 8 - (image[i - 1][j - 1] + image[i - 1][j] + image[i - 1][j + 1] + image[i][j - 1] + image[i][j + 1] + image[i + 1][j - 1] + image[i + 1][j] + image[i + 1][j + 1]).getRed());
+
+			//Second sharpen filter
+			//int blue = image[i][j].getBlue() * 12 - (image[i - 1][j - 1] + image[i - 1][j] + image[i - 1][j + 1] + image[i][j - 1] + image[i][j + 1] + image[i + 1][j - 1] + image[i + 1][j] + image[i + 1][j + 1]).getBlue();
+			//int green = image[i][j].getGreen() * 12 - (image[i - 1][j - 1] + image[i - 1][j] + image[i - 1][j + 1] + image[i][j - 1] + image[i][j + 1] + image[i + 1][j - 1] + image[i + 1][j] + image[i + 1][j + 1]).getGreen();
+			//int red = image[i][j].getRed() * 12 - (image[i - 1][j - 1] + image[i - 1][j] + image[i - 1][j + 1] + image[i][j - 1] + image[i][j + 1] + image[i + 1][j - 1] + image[i + 1][j] + image[i + 1][j + 1]).getRed();
+			//blue = blue / 4;
+			//green = green / 4;
+			//red = red / 4;
+
+			//prevent overflow
 			if (blue >= 255) {
 				blue = 255;
 			}
@@ -167,6 +176,9 @@ void edgedetection(vector<vector<Pixel> >& image, vector<vector<Pixel> >& output
 	};
 
 
+
+
+
 	int sum_blue;
 	int sum_green;
 	int sum_red;
@@ -187,19 +199,24 @@ void edgedetection(vector<vector<Pixel> >& image, vector<vector<Pixel> >& output
 	for (int i = 1; i < h - 1; i++) {
 		for (int j = 1; j < w - 1; j++)
 		{
-			int blue_vertical;
+			//Vertical value variables' definition
+			int blue_vertical; 
 			int green_vertical;
 			int red_vertical;
+
+			//Horizontal value variables' definition
 			int blue_horizontal;
 			int green_horizontal;
 			int red_horizontal;	
 
+			//Initialize sum variables by 0
 			int sum_blue_vertical = 0;
 			int sum_green_vertical = 0;
 			int sum_red_vertical = 0;
 			int sum_blue_horizontal = 0;
 			int sum_green_horizontal = 0;
 			int sum_red_horizontal = 0;
+
 			//filter process 
 			for(int row =i - 1; row <= i+1;row++)
 				for (int col = j - 1; col <= j + 1; col++) {	
@@ -330,53 +347,6 @@ void writeP3Image(ofstream& out, vector<vector<Pixel> >& image, char comment[], 
 
 
 void readAndWriteImageData(ifstream& fin, ofstream& fout, vector<vector<Pixel> >& image, int w, int h)
-{
-	// read and write image data
-	// define input variables
-
-	int charCount = 0;
-	char colorByte;
-
-	//test for P3 read
-	int p3value;
-
-	unsigned char aChar;
-	unsigned int triple[3];   // red, green, blue
-
-	// allocate memory
-	image.resize(h); // allocate h rows
-
-	for (int i = 0; i < h; i++)
-	{
-		image[i].resize(w);   // for each row allocate w columns
-		for (int j = 0; j < w; j++)
-		{
-			for (int k = 0; k < 3; k++)
-			{
-				// read one byte
-				fin.read(&colorByte, 1);
-
-				// convert to unsigned char
-				aChar = (unsigned char)colorByte;
-
-				// save as unsigned int
-				triple[k] = (unsigned int)aChar;
-
-				// write as int
-				fout << triple[k] << ' ';
-			}
-			// CR printed over 32 pixels
-			++charCount;
-			if (charCount == 32) {
-				fout << "\r\n";
-				charCount = 0;
-			}
-			image[i][j].setPixel(triple[0], triple[1], triple[2]);
-		}
-	}
-}
-
-void readAndWriteP3ImageData(ifstream& fin, ofstream& fout, vector<vector<Pixel> >& image, int w, int h)
 {
 	// read and write image data
 	// define input variables

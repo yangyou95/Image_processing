@@ -1,9 +1,7 @@
 ﻿  ImageFunction.cpp
-c:\users\name\desktop\image_processing\vs_codes\image_processing\image_processing\imagefunction.cpp(274): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
-c:\users\name\desktop\image_processing\vs_codes\image_processing\image_processing\imagefunction.cpp(275): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
-c:\users\name\desktop\image_processing\vs_codes\image_processing\image_processing\imagefunction.cpp(276): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
-c:\users\name\desktop\image_processing\vs_codes\image_processing\image_processing\imagefunction.cpp(341): warning C4101: “p3value”: 未引用的局部变量
-c:\users\name\desktop\image_processing\vs_codes\image_processing\image_processing\imagefunction.cpp(388): warning C4101: “p3value”: 未引用的局部变量
-  main.cpp
-  正在生成代码...
-  image_processing.vcxproj -> C:\Users\Name\Desktop\Image_processing\vs_codes\image_processing\Debug\image_processing.exe
+c:\users\yang\documents\github\image_processing\vs_codes\image_processing\image_processing\imagefunction.cpp(297): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+c:\users\yang\documents\github\image_processing\vs_codes\image_processing\image_processing\imagefunction.cpp(298): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+c:\users\yang\documents\github\image_processing\vs_codes\image_processing\image_processing\imagefunction.cpp(299): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+c:\users\yang\documents\github\image_processing\vs_codes\image_processing\image_processing\imagefunction.cpp(364): warning C4101: “p3value”: 未引用的局部变量
+  image_processing.vcxproj -> C:\Users\YANG\Documents\GitHub\Image_processing\vs_codes\image_processing\Debug\image_processing.exe
+  image_processing.vcxproj -> C:\Users\YANG\Documents\GitHub\Image_processing\vs_codes\image_processing\Debug\image_processing.pdb (Partial PDB)
